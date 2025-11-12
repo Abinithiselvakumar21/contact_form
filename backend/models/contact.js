@@ -9,4 +9,4 @@ const contactSchema = new mongoose.Schema({
 }, { timestamps: true }); // createdAt, updatedAt auto add aagum
 
 // Model export pannrom
-module.exports = mongoose.model("Contact", contactSchema);
+module.exports = mongoose.model("Contact", ContactSchema);
