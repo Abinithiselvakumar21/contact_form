@@ -1,46 +1,34 @@
 // server.js
+require("dotenv").config(); // loads variables from .env
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
-// 🟢 Import dependencies
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-
-// 🟢 Create express app
+// Create app
 const app = express();
 
-// 🟢 Middleware setup
-app.use(cors({
-  origin: "http://localhost:3000",
-  methods: ["GET", "POST"],
-  credentials: true
-}));
-app.use(bodyParser.json());
+// Middleware
+app.use(express.json());
+app.use(cors());
 
-// 🟢 Import routes
-const contactRouter = require('./routes/contact');
-const searchRouter  = require('./routes/search');
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected Successfully"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// 🟢 Use routes
-app.use('/api/contact', contactRouter);
-app.use('/api/search', searchRouter);
+// Example route
+app.get("/", (req, res) => {
+  res.send("🚀 Backend is running successfully!");
+});
 
-// 🟢 Environment variables
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI;
+// Example POST route (for a contact form)
+app.post("/api/contact", (req, res) => {
+  const { name, email, message } = req.body;
+  console.log("📩 New contact form submitted:", { name, email, message });
+  res.json({ success: true, message: "Form received!" });
+});
 
-if (!MONGO_URI) {
-  console.error('MONGO_URI missing in env');
-  process.exit(1);
-}
-
-// 🟢 Connect to MongoDB and start server
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-  });
+// Start server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
